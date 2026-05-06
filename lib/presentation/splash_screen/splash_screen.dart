@@ -262,15 +262,15 @@ class _SplashScreenState extends State<SplashScreen>
               children: [
                 const Spacer(flex: 2),
                 _buildLogo(theme),
-                SizedBox(height: 24.h),
+                const SizedBox(height: 32),
                 _buildAppName(theme),
-                SizedBox(height: 8.h),
+                const SizedBox(height: 8),
                 _buildTagline(theme),
                 const Spacer(flex: 2),
                 _buildLoadingIndicator(theme),
-                SizedBox(height: 16.h),
+                const SizedBox(height: 16),
                 _buildStatusMessage(theme),
-                SizedBox(height: 48.h),
+                const SizedBox(height: 48),
               ],
             ),
           ),
@@ -281,8 +281,8 @@ class _SplashScreenState extends State<SplashScreen>
 
   Widget _buildLogo(ThemeData theme) {
     return Container(
-      width: 120.w,
-      height: 120.w,
+      width: 120,
+      height: 120,
       decoration: BoxDecoration(
         color: Colors.white.withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(24),
@@ -327,9 +327,9 @@ class _SplashScreenState extends State<SplashScreen>
 
   Widget _buildLoadingIndicator(ThemeData theme) {
     return _isInitializing
-        ? SizedBox(
-            width: 32.w,
-            height: 32.w,
+        ? const SizedBox(
+            width: 32,
+            height: 32,
             child: CircularProgressIndicator(
               strokeWidth: 3,
               valueColor: AlwaysStoppedAnimation<Color>(

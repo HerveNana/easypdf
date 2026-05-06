@@ -168,7 +168,7 @@ class _DocumentImportState extends State<DocumentImport> {
 
     debugPrint('Storage permission granted, opening file picker');
     try {
-      FilePickerResult? result = await FilePicker.platform.pickFiles(
+      FilePickerResult? result = await FilePicker.pickFiles(
         type: FileType.custom,
         allowedExtensions: ['pdf'],
         allowMultiple: true,
