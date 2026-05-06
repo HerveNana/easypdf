@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:local_auth/local_auth.dart';
 import 'package:lottie/lottie.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../core/app_export.dart';
+import '../../services/biometric_service.dart';
 import '../../widgets/custom_icon_widget.dart';
 import './widgets/biometric_option_widget.dart';
 import './widgets/pin_setup_widget.dart';
@@ -22,7 +22,6 @@ class AuthenticationSetup extends StatefulWidget {
 }
 
 class _AuthenticationSetupState extends State<AuthenticationSetup> {
-  final LocalAuthentication _localAuth = LocalAuthentication();
   final FlutterSecureStorage _secureStorage = const FlutterSecureStorage();
 
   bool _isFaceIdAvailable = false;
@@ -43,17 +42,17 @@ class _AuthenticationSetupState extends State<AuthenticationSetup> {
 
   Future<void> _checkBiometricAvailability() async {
     try {
-      final bool canCheckBiometrics = await _localAuth.canCheckBiometrics;
-      final bool isDeviceSupported = await _localAuth.isDeviceSupported();
+      final canCheck = await BiometricService.canAuthenticate();
+      final isSupported = await BiometricService.isDeviceSupported();
 
-      if (canCheckBiometrics && isDeviceSupported) {
-        final List<BiometricType> availableBiometrics = await _localAuth
-            .getAvailableBiometrics();
-
+      if (canCheck && isSupported) {
+        final available = await BiometricService.getAvailableBiometrics();
         setState(() {
-          _isFaceIdAvailable = availableBiometrics.contains(BiometricType.face);
-          _isFingerprintAvailable = availableBiometrics.contains(
-            BiometricType.fingerprint,
+          _isFaceIdAvailable = available.any(
+            (b) => b.toLowerCase().contains('face'),
+          );
+          _isFingerprintAvailable = available.any(
+            (b) => b.toLowerCase().contains('fingerprint'),
           );
         });
       }
@@ -113,18 +112,11 @@ class _AuthenticationSetupState extends State<AuthenticationSetup> {
 
   Future<bool> _authenticateBiometric(String type) async {
     try {
-      final bool authenticated = await _localAuth.authenticate(
-        localizedReason: type == 'face_id'
+      return await BiometricService.authenticate(
+        type == 'face_id'
             ? 'Authentifiez-vous avec Face ID pour activer la sécurité'
             : 'Authentifiez-vous avec l\'empreinte digitale pour activer la sécurité',
-        options: const AuthenticationOptions(
-          stickyAuth: true,
-          biometricOnly: true,
-          useErrorDialogs: true,
-          sensitiveTransaction: true,
-        ),
       );
-      return authenticated;
     } catch (e) {
       debugPrint('Error authenticating: $e');
       return false;

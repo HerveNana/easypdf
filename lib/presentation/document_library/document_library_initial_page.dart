@@ -129,9 +129,6 @@ class _DocumentLibraryInitialPageState extends State<DocumentLibraryInitialPage>
     _initializePresence();
   }
 
-  void _handleTabChange() {
-    // Removed tab change handler
-  }
 
   Future<void> _initializePresence() async {
     try {

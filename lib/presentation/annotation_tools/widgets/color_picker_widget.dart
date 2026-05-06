@@ -70,7 +70,7 @@ class _ColorPickerWidgetState extends State<ColorPickerWidget> {
 
   /// Build individual color option
   Widget _buildColorOption(ThemeData theme, Color color) {
-    final isSelected = widget.selectedColor.value == color.value;
+    final isSelected = widget.selectedColor.toARGB32() == color.toARGB32();
 
     return GestureDetector(
       onTap: () {
@@ -115,7 +115,7 @@ class _ColorPickerWidgetState extends State<ColorPickerWidget> {
   /// Build custom color option button
   Widget _buildCustomColorOption(ThemeData theme) {
     final isCustomSelected = !_presetColors.any(
-      (color) => color.value == widget.selectedColor.value,
+      (color) => color.toARGB32() == widget.selectedColor.toARGB32(),
     );
 
     return GestureDetector(
@@ -192,30 +192,33 @@ class _ColorPickerWidgetState extends State<ColorPickerWidget> {
           SizedBox(height: 2.h),
 
           // RGB sliders
-          _buildColorSlider(theme, 'Red', widget.selectedColor.red.toDouble(), (
-            value,
-          ) {
-            widget.onColorSelected(
-              Color.fromARGB(
-                255,
-                value.toInt(),
-                widget.selectedColor.green,
-                widget.selectedColor.blue,
-              ),
-            );
-          }),
-          SizedBox(height: 1.h),
           _buildColorSlider(
             theme,
-            'Green',
-            widget.selectedColor.green.toDouble(),
+            'Red',
+            (widget.selectedColor.r * 255.0).round().clamp(0, 255).toDouble(),
             (value) {
               widget.onColorSelected(
                 Color.fromARGB(
                   255,
-                  widget.selectedColor.red,
                   value.toInt(),
-                  widget.selectedColor.blue,
+                  (widget.selectedColor.g * 255.0).round().clamp(0, 255),
+                  (widget.selectedColor.b * 255.0).round().clamp(0, 255),
+                ),
+              );
+            },
+          ),
+          SizedBox(height: 1.h),
+          _buildColorSlider(
+            theme,
+            'Green',
+            (widget.selectedColor.g * 255.0).round().clamp(0, 255).toDouble(),
+            (value) {
+              widget.onColorSelected(
+                Color.fromARGB(
+                  255,
+                  (widget.selectedColor.r * 255.0).round().clamp(0, 255),
+                  value.toInt(),
+                  (widget.selectedColor.b * 255.0).round().clamp(0, 255),
                 ),
               );
             },
@@ -224,13 +227,13 @@ class _ColorPickerWidgetState extends State<ColorPickerWidget> {
           _buildColorSlider(
             theme,
             'Blue',
-            widget.selectedColor.blue.toDouble(),
+            (widget.selectedColor.b * 255.0).round().clamp(0, 255).toDouble(),
             (value) {
               widget.onColorSelected(
                 Color.fromARGB(
                   255,
-                  widget.selectedColor.red,
-                  widget.selectedColor.green,
+                  (widget.selectedColor.r * 255.0).round().clamp(0, 255),
+                  (widget.selectedColor.g * 255.0).round().clamp(0, 255),
                   value.toInt(),
                 ),
               );

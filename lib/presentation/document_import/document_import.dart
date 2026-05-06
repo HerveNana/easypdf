@@ -217,6 +217,7 @@ class _DocumentImportState extends State<DocumentImport> {
       return;
     }
 
+    if (!mounted) return;
     Navigator.of(context, rootNavigator: true).push(
       MaterialPageRoute(
         builder: (context) => _DocumentScannerScreen(
@@ -256,7 +257,7 @@ class _DocumentImportState extends State<DocumentImport> {
     try {
       setState(() => _isImporting = true);
 
-      final account = await _googleSignIn.authenticate();
+      await _googleSignIn.authenticate();
 
       await _secureStorage.write(key: 'google_drive_connected', value: 'true');
       await _secureStorage.write(

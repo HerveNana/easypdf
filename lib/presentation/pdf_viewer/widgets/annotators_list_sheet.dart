@@ -94,8 +94,6 @@ class AnnotatorsListSheet extends StatelessWidget {
     final avatarUrl = user['avatar_url'] as String?;
     final fullName = user['full_name'] as String? ?? 'Unknown User';
     final initials = fullName.split(' ').map((n) => n[0]).take(2).join();
-    final lastActive = user['last_active'] as String?;
-
     return Padding(
       padding: EdgeInsets.only(bottom: 1.h),
       child: ListTile(

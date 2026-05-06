@@ -1,6 +1,7 @@
 import 'dart:async';
-import 'dart:io';
+import 'dart:io' if (dart.library.html) 'dart:io';
 
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
@@ -477,7 +478,7 @@ class _PdfViewerState extends State<PdfViewer> with TickerProviderStateMixin {
           userId: Supabase.instance.client.auth.currentUser?.id ?? '',
           annotationType: _selectedTool,
           pageNumber: _currentPage,
-          color: '#${_selectedColor.value.toRadixString(16).substring(2)}',
+          color: '#${_selectedColor.toARGB32().toRadixString(16).padLeft(8, '0').substring(2)}',
           thickness: _selectedThickness,
           createdAt: DateTime.now(),
           updatedAt: DateTime.now(),
@@ -551,8 +552,9 @@ class _PdfViewerState extends State<PdfViewer> with TickerProviderStateMixin {
               // PDF Viewer
               GestureDetector(
                 onTap: _showToolbar,
-                child:
-                    _documentFilePath != null && _documentFilePath!.isNotEmpty
+                child: (!kIsWeb &&
+                          _documentFilePath != null &&
+                          _documentFilePath!.isNotEmpty)
                     ? SfPdfViewer.file(
                         File(_documentFilePath!),
                         controller: _pdfViewerController,

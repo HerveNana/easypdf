@@ -139,7 +139,7 @@ class TextAnnotationWidget extends StatelessWidget {
           spacing: 2.w,
           runSpacing: 1.h,
           children: colors.map((color) {
-            final isSelected = currentColor.value == color.value;
+            final isSelected = currentColor.toARGB32() == color.toARGB32();
             final isTransparent = color == Colors.transparent;
 
             return GestureDetector(

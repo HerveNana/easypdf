@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:local_auth/local_auth.dart';
 import 'package:sizer/sizer.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../core/app_export.dart';
+import '../../services/biometric_service.dart';
 import '../../services/supabase_service.dart';
 
 /// Splash Screen for EasyPDF application
@@ -24,7 +24,6 @@ class _SplashScreenState extends State<SplashScreen>
   late Animation<double> _fadeAnimation;
   bool _isInitializing = true;
   String _statusMessage = 'Initialisation...';
-  final LocalAuthentication _localAuth = LocalAuthentication();
   final FlutterSecureStorage _secureStorage = const FlutterSecureStorage();
 
   @override
@@ -122,12 +121,11 @@ class _SplashScreenState extends State<SplashScreen>
 
   Future<void> _checkBiometricSetup() async {
     try {
-      final canCheckBiometrics = await _localAuth.canCheckBiometrics;
-      final isDeviceSupported = await _localAuth.isDeviceSupported();
-
-      if (canCheckBiometrics && isDeviceSupported) {
-        final availableBiometrics = await _localAuth.getAvailableBiometrics();
-        debugPrint('Available biometrics: $availableBiometrics');
+      final canCheck = await BiometricService.canAuthenticate();
+      final isSupported = await BiometricService.isDeviceSupported();
+      if (canCheck && isSupported) {
+        final available = await BiometricService.getAvailableBiometrics();
+        debugPrint('Available biometrics: $available');
       }
     } catch (e) {
       debugPrint('Biometric check error: $e');
@@ -146,14 +144,8 @@ class _SplashScreenState extends State<SplashScreen>
 
       if (securityEnabled == 'true' &&
           (faceIdEnabled == 'true' || fingerprintEnabled == 'true')) {
-        final authenticated = await _localAuth.authenticate(
-          localizedReason: 'Authentifiez-vous pour accéder à vos documents',
-          options: const AuthenticationOptions(
-            stickyAuth: true,
-            biometricOnly: false,
-            useErrorDialogs: true,
-            sensitiveTransaction: true,
-          ),
+        final authenticated = await BiometricService.authenticate(
+          'Authentifiez-vous pour accéder à vos documents',
         );
 
         if (!authenticated) {

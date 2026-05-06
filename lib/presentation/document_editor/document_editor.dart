@@ -529,10 +529,11 @@ class _DocumentEditorState extends State<DocumentEditor> {
             ),
             TextButton(
               onPressed: () {
+                final nav = Navigator.of(context, rootNavigator: true);
                 Navigator.pop(context);
                 _saveDocument();
                 Future.delayed(const Duration(seconds: 2), () {
-                  Navigator.of(context, rootNavigator: true).pop();
+                  nav.pop();
                 });
               },
               child: const Text('Save'),
