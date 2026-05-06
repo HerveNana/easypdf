@@ -31,12 +31,8 @@ class BiometricService {
   static Future<bool> authenticate(String reason) async {
     return await _auth.authenticate(
       localizedReason: reason,
-      options: const AuthenticationOptions(
-        stickyAuth: true,
-        biometricOnly: false,
-        useErrorDialogs: true,
-        sensitiveTransaction: true,
-      ),
+      sensitiveTransaction: true,
+      persistAcrossBackgrounding: true,
     );
   }
 }
