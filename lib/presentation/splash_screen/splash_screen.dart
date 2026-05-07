@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:sizer/sizer.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../core/app_export.dart';
@@ -327,7 +326,7 @@ class _SplashScreenState extends State<SplashScreen>
 
   Widget _buildLoadingIndicator(ThemeData theme) {
     return _isInitializing
-        ? const SizedBox(
+        ? SizedBox(
             width: 32,
             height: 32,
             child: CircularProgressIndicator(

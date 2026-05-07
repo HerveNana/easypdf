@@ -3,7 +3,6 @@ import 'package:sizer/sizer.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../core/app_export.dart';
-import '../../models/document_model.dart';
 import '../../services/collaboration_service.dart';
 import '../../services/presence_service.dart';
 import './widgets/document_grid_item_widget.dart';
@@ -29,8 +28,6 @@ class _DocumentLibraryInitialPageState extends State<DocumentLibraryInitialPage>
   bool _isGridView = true;
   bool _isSelectionMode = false;
   final Set<int> _selectedDocuments = {};
-  bool _isLoadingDocuments = true;
-  List<DocumentModel> _supabaseDocuments = [];
   String _syncStatus = 'connected';
   final Map<String, List<Map<String, dynamic>>> _documentViewers = {};
   RealtimeChannel? _presenceChannel;
@@ -177,8 +174,6 @@ class _DocumentLibraryInitialPageState extends State<DocumentLibraryInitialPage>
       final documents = await _collaborationService.getAllDocuments();
       if (mounted) {
         setState(() {
-          _supabaseDocuments = documents;
-          _isLoadingDocuments = false;
           // Convert Supabase documents to legacy format
           final supabaseLegacyDocs = documents
               .map((doc) => doc.toLegacyFormat())
@@ -269,9 +264,7 @@ class _DocumentLibraryInitialPageState extends State<DocumentLibraryInitialPage>
         });
       }
     } catch (e) {
-      if (mounted) {
-        setState(() => _isLoadingDocuments = false);
-      }
+      debugPrint('Failed to load documents: $e');
     }
   }
 

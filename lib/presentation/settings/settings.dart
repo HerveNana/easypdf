@@ -3,7 +3,6 @@ import 'package:sizer/sizer.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../core/app_export.dart';
-import '../../services/collaboration_service.dart';
 import './widgets/destructive_action_widget.dart';
 import './widgets/settings_item_widget.dart';
 import './widgets/settings_section_widget.dart';
@@ -20,31 +19,6 @@ class Settings extends StatefulWidget {
 }
 
 class _SettingsState extends State<Settings> {
-  final CollaborationService _collaborationService =
-      CollaborationService.instance;
-  String _userName = 'Loading...';
-  String _userEmail = '';
-
-  @override
-  void initState() {
-    super.initState();
-    _loadUserProfile();
-  }
-
-  Future<void> _loadUserProfile() async {
-    try {
-      final profile = await _collaborationService.getCurrentUserProfile();
-      if (profile != null && mounted) {
-        setState(() {
-          _userName = profile.fullName;
-          _userEmail = profile.email;
-        });
-      }
-    } catch (e) {
-      debugPrint('Failed to load user profile: $e');
-    }
-  }
-
   Future<void> _signOut() async {
     try {
       await Supabase.instance.client.auth.signOut();
@@ -97,37 +71,31 @@ class _SettingsState extends State<Settings> {
             fontWeight: FontWeight.w600,
           ),
         ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            RadioListTile<String>(
-              title: const Text('Clair'),
-              value: 'light',
-              groupValue: _themeMode,
-              onChanged: (value) {
-                setState(() => _themeMode = value!);
-                Navigator.of(dialogContext).pop();
-              },
-            ),
-            RadioListTile<String>(
-              title: const Text('Sombre'),
-              value: 'dark',
-              groupValue: _themeMode,
-              onChanged: (value) {
-                setState(() => _themeMode = value!);
-                Navigator.of(dialogContext).pop();
-              },
-            ),
-            RadioListTile<String>(
-              title: const Text('Automatique'),
-              value: 'auto',
-              groupValue: _themeMode,
-              onChanged: (value) {
-                setState(() => _themeMode = value!);
-                Navigator.of(dialogContext).pop();
-              },
-            ),
-          ],
+        content: RadioGroup<String>(
+          groupValue: _themeMode,
+          onChanged: (value) {
+            if (value != null) {
+              setState(() => _themeMode = value);
+              Navigator.of(dialogContext).pop();
+            }
+          },
+          child: const Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              RadioListTile<String>(
+                title: Text('Clair'),
+                value: 'light',
+              ),
+              RadioListTile<String>(
+                title: Text('Sombre'),
+                value: 'dark',
+              ),
+              RadioListTile<String>(
+                title: Text('Automatique'),
+                value: 'auto',
+              ),
+            ],
+          ),
         ),
       ),
     );

@@ -28,7 +28,6 @@ class DocumentImport extends StatefulWidget {
 }
 
 class _DocumentImportState extends State<DocumentImport> {
-  bool _isImporting = false;
   bool _encryptionEnabled = false;
   List<Map<String, dynamic>> _importingFiles = [];
   List<CameraDescription>? _cameras;
@@ -182,7 +181,6 @@ class _DocumentImportState extends State<DocumentImport> {
         }
 
         setState(() {
-          _isImporting = true;
           _importingFiles = result.files.map((file) {
             return {
               'name': file.name,
@@ -224,7 +222,6 @@ class _DocumentImportState extends State<DocumentImport> {
           cameras: _cameras!,
           onDocumentScanned: (List<String> scannedPages) {
             setState(() {
-              _isImporting = true;
               _importingFiles = scannedPages.asMap().entries.map((entry) {
                 return {
                   'name': 'Scanned_Document_${entry.key + 1}.pdf',
@@ -255,8 +252,6 @@ class _DocumentImportState extends State<DocumentImport> {
 
   Future<void> _handleGoogleDriveConnection() async {
     try {
-      setState(() => _isImporting = true);
-
       await _googleSignIn.authenticate();
 
       await _secureStorage.write(key: 'google_drive_connected', value: 'true');
@@ -268,12 +263,10 @@ class _DocumentImportState extends State<DocumentImport> {
       setState(() {
         _isGoogleDriveConnected = true;
         _lastGoogleDriveSync = DateTime.now();
-        _isImporting = false;
       });
 
       _showSuccessMessage('Google Drive connecté avec succès');
     } catch (e) {
-      setState(() => _isImporting = false);
       _showErrorDialog('Erreur de connexion à Google Drive: ${e.toString()}');
     }
   }
@@ -440,7 +433,6 @@ class _DocumentImportState extends State<DocumentImport> {
             onPressed: () {
               Navigator.of(context).pop();
               setState(() {
-                _isImporting = false;
                 _importingFiles.clear();
               });
             },
