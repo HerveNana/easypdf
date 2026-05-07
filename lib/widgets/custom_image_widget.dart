@@ -10,7 +10,7 @@ extension ImageTypeExtension on String {
       return ImageType.network;
     } else if (endsWith('.svg')) {
       return ImageType.svg;
-    } else if (startsWith('file: //')) {
+    } else if (startsWith('file://') || startsWith('/')) {
       return ImageType.file;
     } else {
       return ImageType.png;
@@ -108,72 +108,90 @@ class CustomImageWidget extends StatelessWidget {
   }
 
   Widget _buildImageView() {
-    if (imageUrl != null) {
-      switch (imageUrl!.imageType) {
-        case ImageType.svg:
-          return SizedBox(
-            height: height,
-            width: width,
-            child: SvgPicture.asset(
-              imageUrl!,
-              height: height,
-              width: width,
-              fit: fit ?? BoxFit.contain,
-              colorFilter: color != null
-                  ? ColorFilter.mode(
-                      color ?? Colors.transparent,
-                      BlendMode.srcIn,
-                    )
-                  : null,
-              semanticsLabel: semanticLabel,
-            ),
-          );
-        case ImageType.file:
-          return Image.file(
-            File(imageUrl!),
-            height: height,
-            width: width,
-            fit: fit ?? BoxFit.cover,
-            color: color,
-            semanticLabel: semanticLabel,
-          );
-        case ImageType.network:
-          return CachedNetworkImage(
-            height: height,
-            width: width,
-            fit: fit,
-            imageUrl: imageUrl!,
-            color: color,
-            placeholder: (context, url) => SizedBox(
-              height: 30,
-              width: 30,
-              child: LinearProgressIndicator(
-                color: Colors.grey.shade200,
-                backgroundColor: Colors.grey.shade100,
-              ),
-            ),
-            errorWidget: (context, url, error) =>
-                errorWidget ??
-                Image.asset(
-                  placeHolder,
-                  height: height,
-                  width: width,
-                  fit: fit ?? BoxFit.cover,
-                  semanticLabel: semanticLabel,
-                ),
-          );
-        case ImageType.png:
-        default:
-          return Image.asset(
+    if (imageUrl == null || imageUrl!.isEmpty) {
+      return _buildPdfPlaceholder();
+    }
+    switch (imageUrl!.imageType) {
+      case ImageType.svg:
+        return SizedBox(
+          height: height,
+          width: width,
+          child: SvgPicture.asset(
             imageUrl!,
             height: height,
             width: width,
-            fit: fit ?? BoxFit.cover,
-            color: color,
-            semanticLabel: semanticLabel,
-          );
-      }
+            fit: fit ?? BoxFit.contain,
+            colorFilter: color != null
+                ? ColorFilter.mode(
+                    color ?? Colors.transparent,
+                    BlendMode.srcIn,
+                  )
+                : null,
+            semanticsLabel: semanticLabel,
+          ),
+        );
+      case ImageType.file:
+        return Image.file(
+          File(imageUrl!.replaceFirst('file://', '')),
+          height: height,
+          width: width,
+          fit: fit ?? BoxFit.cover,
+          color: color,
+          semanticLabel: semanticLabel,
+          errorBuilder: (context, error, stackTrace) => _buildPdfPlaceholder(),
+        );
+      case ImageType.network:
+        return CachedNetworkImage(
+          height: height,
+          width: width,
+          fit: fit,
+          imageUrl: imageUrl!,
+          color: color,
+          placeholder: (context, url) => SizedBox(
+            height: 30,
+            width: 30,
+            child: LinearProgressIndicator(
+              color: Colors.grey.shade200,
+              backgroundColor: Colors.grey.shade100,
+            ),
+          ),
+          errorWidget: (context, url, error) =>
+              errorWidget ?? _buildPdfPlaceholder(),
+        );
+      case ImageType.png:
+      default:
+        return Image.asset(
+          imageUrl!,
+          height: height,
+          width: width,
+          fit: fit ?? BoxFit.cover,
+          color: color,
+          semanticLabel: semanticLabel,
+          errorBuilder: (context, error, stackTrace) => _buildPdfPlaceholder(),
+        );
     }
-    return SizedBox();
+  }
+
+  Widget _buildPdfPlaceholder() {
+    return Container(
+      height: height,
+      width: width,
+      color: Colors.grey.shade100,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.picture_as_pdf, size: 40, color: Colors.red.shade300),
+          const SizedBox(height: 4),
+          Text(
+            'PDF',
+            style: TextStyle(
+              fontSize: 12,
+              color: Colors.grey.shade500,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
